@@ -162,7 +162,7 @@ int main() {
             std::cerr << "CPU Temp: " << cpuTemp << " C\n";
             if(cpuTemp <= 50){ec.WriteEC(CPU_FAN_WRITE_OFFSET, 0);}
             else if(cpuTemp <= 60){
-                ec.WriteEC(CPU_FAN_WRITE_OFFSET, (2 * cpuTemp) - 50);
+                ec.WriteEC(CPU_FAN_WRITE_OFFSET, (2 * cpuTemp) - 90);
                 std::cout << "cpu fans - standard";
             }
             else{
@@ -185,7 +185,7 @@ int main() {
                 std::cout << "\nGPU Temp: " << gpuTemp << " C" << std::endl;
                 if(gpuTemp <= 50){ec.WriteEC(GPU_FAN_WRITE_OFFSET, 0);}
                 else if(gpuTemp <= 70){
-                    ec.WriteEC(GPU_FAN_WRITE_OFFSET, (2.8 * gpuTemp) - 110);
+                    ec.WriteEC(GPU_FAN_WRITE_OFFSET, (2.8 * gpuTemp) - 150);
                     std::cerr << "gpu fans - standard";
                 }
                 else {
