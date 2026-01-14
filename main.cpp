@@ -85,7 +85,7 @@ public:
                 }
                 std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
-            std::cerr << "Warning: EC Read Timeout (OBF stuck)" << std::endl;
+            //std::cerr << "Warning: EC Read Timeout (OBF stuck)" << std::endl;
         }
 
         // Read a byte from the EC RAM at specific offset
@@ -151,7 +151,7 @@ int main() {
 
     while (!stopRequest) {
         system("cls");
-        std::cerr << "--------------------------------------------------\n";
+        std::cerr << "----------------- FAN CONTROL -----------------\n";
 
         // 3. Direct Query (No string parsing, just a uint)
         result = nvmlDeviceGetTemperature(device, NVML_TEMPERATURE_GPU, &gpuTemp);
@@ -159,22 +159,23 @@ int main() {
         cpuTemp = ec.ReadEc(0xB1);
         int temporaryTemperatureCalc = cpuTemp - previousCpuTemp;
         if((cpuTemp && cpuTemp <= 150)&&(temporaryTemperatureCalc <= 30 || temporaryTemperatureCalc >= -20)){
-            std::cerr << "CPU Temp: " << cpuTemp << " C\n";
+            std::cerr << "CPU Temp: " << cpuTemp << " C";
             if(cpuTemp <= 50){ec.WriteEC(CPU_FAN_WRITE_OFFSET, 0);}
-            else if(cpuTemp <= 60){
-                ec.WriteEC(CPU_FAN_WRITE_OFFSET, (2 * cpuTemp) - 90);
-                std::cout << "cpu fans - standard";
-            }
+            /*else if(cpuTemp <= 60){
+                ec.WriteEC(CPU_FAN_WRITE_OFFSET, (3.1 * cpuTemp) - 150);
+                std::cout << "\ncpu fans - standard";
+                std::cout << "\ndata on cpu fan offset = " << ec.ReadEc(CPU_FAN_WRITE_OFFSET);
+                }*/
             else{
                 //ec.WriteEC(CPU_FAN_WRITE_OFFSET, (cpuTemp - 15));
                 //ec.WriteEC(CPU_FAN_WRITE_OFFSET, (0.8 * cpuTemp));
                 cpuTemp-=35;
                 ec.WriteEC(CPU_FAN_WRITE_OFFSET, std::sqrt(cpuTemp/0.0065));
-                std::cout << "data on cpu fan offset = " << ec.ReadEc(CPU_FAN_WRITE_OFFSET) << "\n";
+                std::cout << "\ndata on cpu fan offset = " << ec.ReadEc(CPU_FAN_WRITE_OFFSET);
             }
-            std::cerr << "\n" << previousCpuTemp;
-            previousCpuTemp = cpuTemp;
-            std::cerr << " " << cpuTemp << "\n";
+            //std::cerr << "\n" << previousCpuTemp;
+            //previousCpuTemp = cpuTemp;
+            //std::cerr << " " << cpuTemp << "\n";
         }
         else{}
 
@@ -182,22 +183,23 @@ int main() {
         if (NVML_SUCCESS == result) {
             int temporaryTemperatureCalc = gpuTemp - previousGpuTemp;
             if(temporaryTemperatureCalc <= 30 || temporaryTemperatureCalc >= -20){
-                std::cout << "\nGPU Temp: " << gpuTemp << " C" << std::endl;
+                std::cout << "\n\nGPU Temp: " << gpuTemp << " C";
                 if(gpuTemp <= 50){ec.WriteEC(GPU_FAN_WRITE_OFFSET, 0);}
-                else if(gpuTemp <= 70){
-                    ec.WriteEC(GPU_FAN_WRITE_OFFSET, (2.8 * gpuTemp) - 150);
-                    std::cerr << "gpu fans - standard";
-                }
+                /*else if(gpuTemp <= 70){
+                    ec.WriteEC(GPU_FAN_WRITE_OFFSET, (2 * gpuTemp) - 90);
+                    std::cerr << "\ngpu fans - standard";
+                    std::cout << "\ndata on gpu fan offset = " << ec.ReadEc(GPU_FAN_WRITE_OFFSET);
+                    }*/
                 else {
                     //ec.WriteEC(GPU_FAN_WRITE_OFFSET, (gpuTemp-15));
                     //ec.WriteEC(GPU_FAN_WRITE_OFFSET, (0.8 * gpuTemp));
-                    gpuTemp -= 25;
+                    gpuTemp -= 35;
                     ec.WriteEC(GPU_FAN_WRITE_OFFSET, std::sqrt(gpuTemp/0.0055));
-                    std::cout << "data on gpu fan offset = " << ec.ReadEc(GPU_FAN_WRITE_OFFSET) << "\n";
+                    std::cout << "\ndata on gpu fan offset = " << ec.ReadEc(GPU_FAN_WRITE_OFFSET);
                 }
-                std::cerr << "\n" << previousGpuTemp;
-                previousGpuTemp = gpuTemp;
-                std::cerr << " " << gpuTemp << "\n";
+                //std::cerr << "\n" << previousGpuTemp;
+                //previousGpuTemp = gpuTemp;
+                //std::cerr << " " << gpuTemp << "\n";
             }
             else{}
         }
@@ -205,7 +207,7 @@ int main() {
             std::cerr << "Query failed: " << nvmlErrorString(result) << std::endl;
         }
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     // 4. Shutdown
