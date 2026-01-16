@@ -1,1 +1,6 @@
 *.exe
+*.dll
+*.so
+*.a
+*.lib
+InpOutBinaries_1501/
